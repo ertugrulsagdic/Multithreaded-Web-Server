@@ -36,11 +36,18 @@ class Thread(threading.Thread):
                     print('{} sended. File_size : {}'.format(file_name, file_size))
                     self.socket.close()
                     return
+                elif file_size < 100 or file_size > 20000:
+                    self.socket.send(b'400 Bad Request aaa')
+                    print(b'400 Bad Request')
+                    self.socket.close()
+                    return
+
 
             self.socket.send(b'HTTP/1.1 404 Not Found')
             print('{} bytes file not found'.format(file_size))
             self.socket.close()
         except:
             self.socket.send(b'400 Bad Request')
+            print(b'bbbbb')
             print(b'400 Bad Request')
             self.socket.close()
