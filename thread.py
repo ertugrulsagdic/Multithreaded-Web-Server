@@ -3,13 +3,14 @@ from socket import *
 import os
 import pathlib
 
+
 class Thread(threading.Thread):
     def __init__(self, ip, port, socket):
         threading.Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.socket = socket
-    
+
     def process(self):
         try:
             request = self.socket.recv(1024)
@@ -21,20 +22,21 @@ class Thread(threading.Thread):
             print(file_size[1:])
             file_size = int(file_size[1:])
 
-
             for file_name in os.listdir('./html'):
-                print(pathlib.Path().absolute() + '\\html\\' + file_name)
-                print(file_size, file_name, os.stat(pathlib.Path().absolute() + '\\html\\' + file_name).st_size)
-                st = os.stat(pathlib.Path().absolute() + '\\html\\' + file_name)
+                path_to_file = os.getcwd() + '\\html\\' + file_name
+                print('path_to_file  ', path_to_file)
+                st = os.stat(path_to_file)
+                print(pathlib.Path().absolute())
+                print(file_size, file_name, st.st_size)
                 if st.st_size == file_size:
-                    f = open(pathlib.Path().absolute() + '\\html\\' + file_name)
+                    f = open(path_to_file)
                     content = f.read()
                     self.socket.send(b'HTTP/1.1 200 OK')
                     self.socket.send(content.encode())
                     print('{} sended. File_size : {}'.format(file_name, file_size))
                     self.socket.close()
                     return
-            
+
             self.socket.send(b'HTTP/1.1 404 Not Found')
             print('{} bytes file not found'.format(file_size))
             self.socket.close()
@@ -42,12 +44,3 @@ class Thread(threading.Thread):
             self.socket.send(b'400 Bad Request')
             print(b'400 Bad Request')
             self.socket.close()
-
-
-
-
-
-
-
-
-
