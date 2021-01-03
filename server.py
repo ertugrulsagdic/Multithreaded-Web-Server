@@ -2,13 +2,15 @@ from socket import *
 from thread import *
 
 IP = 'localhost'
-PORT = 12000
+PORT = 8080
 
 server_socket = socket(AF_INET, SOCK_STREAM)
 server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 threads = []
 server_socket.bind((IP, PORT))
-server_socket.listen(1)
+
+## ??
+server_socket.listen(10)
 
 print('Server is ready to receive')
 
