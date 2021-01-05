@@ -19,7 +19,7 @@ def get_file(file_size):
         print('File is not in cache.')
         message_header_content = get_file_from_server(file_size)
 
-        if message_header_content > 2:
+        if len(message_header_content) > 2:
             save_to_cache(file_size, message_header_content[2])
             return True, message_header_content[2]
         else:
@@ -38,8 +38,11 @@ def get_file_from_server(file_size):
 
     try:
         response = urlopen(request)
-        message_header_content = response.split('\n')
-        return message_header_content
+        # print('Response',response)
+        # print("decode",response.read().decode())
+        # print('info',response.info())
+
+        return response.read().decode()
     except HTTPError:
         return None
 
