@@ -141,6 +141,7 @@ while True:
     childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
     childThread.start()
     childThread.join()
+    # connection_socket.close()
 
 # closes socket
 server_socket.close()
