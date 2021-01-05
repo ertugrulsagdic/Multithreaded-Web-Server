@@ -63,33 +63,31 @@ def thread_function(socket, address):
                 print(b'Please provide file size between 100 and 20000')
                 socket.close()
             else:
-                # checks all the files if there is a file with given size
-                for file_name in os.listdir('./html'):
-                    # gets the file path
-                    path_to_file = os.getcwd() + '\\html\\' + file_name
-                    st = os.stat(path_to_file)
-                    print(file_size, file_name, st.st_size)
-                    # checks if the file size is equals
-                    if st.st_size == file_size:
-                        # opens the file and reads the content in it
-                        f = open(path_to_file)
-                        response_content = f.read()
-                        f.close()
-                        response_headers = {
-                            'Content-Type': 'text/html; encoding=utf8',
-                            'Content-Length': len(response_content),
-                        }
-                        response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
 
-                        # reply as HTTP/1.1 server, saying "HTTP OK" (code 200)
-                        response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n" + response_content
-                        socket.send(response.encode())
-                        # # send response
-                        # socket.send(response_headers_raw.encode())
-                        # # send response content
-                        # socket.send(response_content.encode())
-                        print('{} sended. File size : {}'.format(file_name, file_size))
-                        break
+                response_content_body = ''
+                for _ in range(0, file_size - 78):
+                    response_content_body = response_content_body + 'a'
+
+                response_content = '<HTML>\n' \
+                                   + '<HEAD>\n' \
+                                   + '<TITLE>I am ' \
+                                   + str(file_size) \
+                                   + ' bytes long</TITLE>\n' \
+                                   + '<BODY>' \
+                                   + str(response_content_body) \
+                                   + '</BODY>\n' \
+                                   + '</HEAD>\n' \
+                                   + '</HTML>'
+
+                response_headers = {
+                    'Content-Type': 'text/html; encoding=utf8',
+                    'Content-Length': len(response_content),
+                }
+                response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
+
+                # reply as HTTP/1.1 server, saying "HTTP OK" (code 200) and header and content
+                response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n" + response_content
+                socket.send(response.encode())
                 socket.close()
         else:
             socket.send(b'400 Bad Request')
