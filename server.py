@@ -18,10 +18,11 @@ def thread_function(socket, address):
             command = splitted_request[0]
         print("command ", command)
         # file size
+        file_size = 0
         if len(splitted_request) >= 2:
             # todo error burda integer olup olmadigini kontrol etmemiz lazim
             try:
-                file_size = int(splitted_request[1])
+                file_size = splitted_request[1]
                 print(file_size[1:])
                 file_size = int(file_size[1:])
                 print(b'file size ok')
@@ -67,11 +68,12 @@ def thread_function(socket, address):
                         response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
 
                         # reply as HTTP/1.1 server, saying "HTTP OK" (code 200)
-                        socket.send(b'HTTP/1.1 200 OK')
-                        # send response
-                        socket.send(response_headers_raw.encode())
-                        # send response content
-                        socket.send(response_content.encode())
+                        response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n\n" + response_content
+                        socket.send(response.encode())
+                        # # send response
+                        # socket.send(response_headers_raw.encode())
+                        # # send response content
+                        # socket.send(response_content.encode())
                         print('{} sended. File size : {}'.format(file_name, file_size))
                         break
                 socket.close()
