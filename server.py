@@ -20,7 +20,6 @@ def thread_function(socket, address):
         # file size
         file_size = 0
         if len(splitted_request) >= 2:
-            # todo error burda integer olup olmadigini kontrol etmemiz lazim
             try:
                 file_size = splitted_request[1]
                 print(file_size[1:])
@@ -28,25 +27,40 @@ def thread_function(socket, address):
                 print(b'file size ok')
             except:
                 socket.send(b'400 Bad Request')
-                socket.send(b'Please enter integer value')
+                socket.send(b'File size is not integer\n')
+                socket.send(b'Please provide an integer value')
                 print(b'400 Bad Request')
+                print(b'File size is not integer')
+                print(b'Please provide an integer value')
                 socket.close()
                 return
 
-        if command.upper() == b'HEAD' \
-                or command.upper() == b'POST' \
-                or command.upper() == b'PUT' \
-                or command.upper() == b'DELETE' \
-                or command.upper() == b'CONNECT' \
-                or command.upper() == b'OPTIONS' \
-                or command.upper() == b'TRACE':
+        if command == b'HEAD' \
+                or command == b'POST' \
+                or command == b'PUT' \
+                or command == b'DELETE' \
+                or command == b'CONNECT' \
+                or command == b'OPTIONS' \
+                or command == b'TRACE':
             socket.send(b'501 Not implemented')
             print(b'501 Not implemented')
             socket.close()
-        elif command.upper() == b'GET':
-            if file_size < 100 or file_size > 20000:
-                socket.send(b'400 Bad Request aaa')
+        elif command == b'GET':
+            if file_size < 100:
+                socket.send(b'400 Bad Request')
+                socket.send(b'File size is less than 100\n')
+                socket.send(b'Please provide file size between 100 and 20000')
                 print(b'400 Bad Request')
+                print(b'File size is less than 100')
+                print(b'Please provide file size between 100 and 20000')
+                socket.close()
+            elif file_size > 20000:
+                socket.send(b'400 Bad Request')
+                socket.send(b'File size is less than 100\n')
+                socket.send(b'Please provide file size between 100 and 20000')
+                print(b'400 Bad Request')
+                print(b'File size is greater than 20000')
+                print(b'Please provide file size between 100 and 20000')
                 socket.close()
             else:
                 # checks all the files if there is a file with given size
@@ -68,7 +82,7 @@ def thread_function(socket, address):
                         response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
 
                         # reply as HTTP/1.1 server, saying "HTTP OK" (code 200)
-                        response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n\n" + response_content
+                        response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n" + response_content
                         socket.send(response.encode())
                         # # send response
                         # socket.send(response_headers_raw.encode())
