@@ -26,6 +26,7 @@ def thread_function(socket, address):
                 file_size = int(file_size[1:])
                 print(b'file size ok')
             except:
+                # reply as HTTP/1.1 server, saying "HTTP Bad Request" (code 400)
                 socket.send(b'400 Bad Request')
                 socket.send(b'File size is not integer\n')
                 socket.send(b'Please provide an integer value')
@@ -42,12 +43,14 @@ def thread_function(socket, address):
                 or command == b'CONNECT' \
                 or command == b'OPTIONS' \
                 or command == b'TRACE':
+            # reply as HTTP/1.1 server, saying "HTTP Not Implemented" (code 501)
             socket.send(b'501 Not implemented')
             print(b'501 Not implemented')
             socket.close()
         elif command == b'GET':
             if file_size < 100:
-                socket.send(b'400 Bad Request')
+                # reply as HTTP/1.1 server, saying "HTTP Bad Request" (code 400)
+                socket.send(b'HTTP/1.1 400 Bad Request')
                 socket.send(b'File size is less than 100\n')
                 socket.send(b'Please provide file size between 100 and 20000')
                 print(b'400 Bad Request')
@@ -55,7 +58,8 @@ def thread_function(socket, address):
                 print(b'Please provide file size between 100 and 20000')
                 socket.close()
             elif file_size > 20000:
-                socket.send(b'400 Bad Request')
+                # reply as HTTP/1.1 server, saying "HTTP Bad Request" (code 400)
+                socket.send(b'HTTP/1.1 400 Bad Request')
                 socket.send(b'File size is less than 100\n')
                 socket.send(b'Please provide file size between 100 and 20000')
                 print(b'400 Bad Request')
@@ -63,6 +67,8 @@ def thread_function(socket, address):
                 print(b'Please provide file size between 100 and 20000')
                 socket.close()
             else:
+                # reply as HTTP/1.1 server, saying "HTTP OK" (code 200)
+                response_message = 'HTTP/1.1 200 OK\n'
 
                 response_content_body = ''
                 for _ in range(0, file_size - 78):
@@ -85,16 +91,18 @@ def thread_function(socket, address):
                 }
                 response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
 
-                # reply as HTTP/1.1 server, saying "HTTP OK" (code 200) and header and content
-                response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n" + response_content
+                # send message, header and content
+                response = response_message + response_headers_raw + "\n" + response_content
                 socket.send(response.encode())
                 socket.close()
         else:
+            # reply as HTTP/1.1 server, saying "HTTP Bad Request" (code 400)
             socket.send(b'400 Bad Request')
             print(b'400 Bad Request')
             socket.close()
     # if any errors caught
     except error:
+        # reply as HTTP/1.1 server, saying "HTTP Bad Request" (code 400)
         socket.send(b'400 Bad Request')
         print(b'400 Bad Request')
         print(error)
