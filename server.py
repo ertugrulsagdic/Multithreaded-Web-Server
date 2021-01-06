@@ -12,6 +12,9 @@ def thread_function(socket, address):
         request = socket.recv(1024)
         print(request)
 
+        if request == b'':
+            return
+
         # splits the request into part so that we can get the size of the file
         splitted_request = request.split()
         command = splitted_request[0]
@@ -126,7 +129,7 @@ except socket.error as msg:
     print(msg)
     sys.exit()
 
-server_socket.listen(1)
+server_socket.listen(10)
 
 print('Server is ready to receive')
 
@@ -139,7 +142,7 @@ while True:
     # creates a threads to run incoming requests
     childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
     childThread.start()
-    childThread.join()
+    #childThread.join()
     # connection_socket.close()
 
 # closes socket

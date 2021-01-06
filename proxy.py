@@ -81,6 +81,9 @@ def thread_function(socket, address):
     request = socket.recv(1024)
     print('request ', request)
 
+    if request == b'':
+        return
+
     splitted_request = request.split()
     command = splitted_request[0]
     print("command ", command)
@@ -174,7 +177,7 @@ def main():
         print(msg)
         sys.exit()
 
-    server_socket.listen(1)
+    server_socket.listen(10)
 
     print('Proxy Server ready to receive')
     
@@ -183,7 +186,7 @@ def main():
 
         childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
         childThread.start()
-        childThread.join()
+        #childThread.join()
 
         #connection_socket.close()
 
