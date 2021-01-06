@@ -11,7 +11,6 @@ PORT = 8888
 
 def get_file(file_size):
     file_from_cache = get_file_from_cache(file_size)
-
     if file_from_cache:
         print('Hit Cache')
         return True, file_from_cache
@@ -20,15 +19,16 @@ def get_file(file_size):
         message_header_content = get_file_from_server(file_size)
 
         if len(message_header_content) > 2:
-            save_to_cache(file_size, message_header_content[2])
-            return True, message_header_content[2]
+            save_to_cache(file_size, message_header_content)
+            return True, message_header_content
         else:
             return False, message_header_content
 
 def save_to_cache(file_size, content):
     print('Save the file to the cache')
-    file_that_will_be_cached = open('cached_files/' + str(file_size) + 'bytes', 'w' )
-    file_that_will_be_cached.write(content)
+    file_that_will_be_cached = open('cached_files/' + str(file_size) + 'bytes.html', 'wb')
+    print(len(content))
+    file_that_will_be_cached.write(content.encode())
     file_that_will_be_cached.close()
 
 
@@ -44,6 +44,7 @@ def get_file_from_server(file_size):
 
         return response.read().decode()
     except HTTPError:
+        print(HTTPError)
         return None
 
 
@@ -78,7 +79,7 @@ def get_file_from_cache(file_size):
 def thread_function(socket, address):
     # Get the request
     request = socket.recv(1024)
-    print(request)
+    print('request ', request)
 
     splitted_request = request.split()
     command = splitted_request[0]
@@ -103,27 +104,66 @@ def thread_function(socket, address):
     other words, if the URI is greater than 9,999) it would not pass the request to the web server.
     Rather it sends “Request-URI Too Long” message with error code 414.
     '''
-    if file_size > 9999:
-        socket.send(b'414 Request-URI Too Long')
-        print(b'414 Request-URI Too Long')
-        socket.close()
+    # if file_size > 9999:
+    #     socket.send(b'414 Request-URI Too Long')
+    #     print(b'414 Request-URI Too Long')
+    #     socket.close()
 
-    isTrue, content_or_response = get_file(file_size)
-
-    if isTrue:
-        response_headers = {
-            'Content-Type': 'text/html; encoding=utf8',
-            'Content-Length': len(content_or_response),
-        }
-        response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
-        response = 'HTTP/1.0 200 OK\n' + response_headers_raw + '\n' + content_or_response
-        socket.send(response.encode())
-        print('Proxy has sent the file. File size : {}'.format(file_size))
+    if command == b'HEAD' \
+            or command == b'POST' \
+            or command == b'PUT' \
+            or command == b'DELETE' \
+            or command == b'CONNECT' \
+            or command == b'OPTIONS' \
+            or command == b'TRACE':
+        # reply "HTTP Not Implemented" (code 501)
+        socket.send(b'501 Not implemented')
+        print(b'501 Not implemented')
         socket.close()
+    elif command == b'GET':
+        if file_size < 100:
+            # reply "HTTP Bad Request" (code 400)
+            socket.send(b'400 Bad Request')
+            socket.send(b'File size is less than 100\n')
+            socket.send(b'Please provide file size between 100 and 20000')
+            print(b'400 Bad Request')
+            print(b'File size is less than 100')
+            print(b'Please provide file size between 100 and 20000')
+            socket.close()
+        elif file_size > 9999:
+            # reply "HTTP Bad Request" (code 400)
+            socket.send(b'414 Request-URI Too Long')
+            print(b'414 Request-URI Too Long')
+            socket.close()
+        else:
+
+            try:
+                isTrue, content_or_response = get_file(file_size)
+            except:
+                socket.send(b'404 Not Fount')
+                print(b'404 Not Found')
+                socket.close()
+                return
+
+            if isTrue:
+                response_headers = {
+                    'Content-Type': 'text/html; encoding=utf8',
+                    'Content-Length': len(content_or_response),
+                }
+                response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
+                response = '200 OK\n' + response_headers_raw + '\n' + content_or_response
+                socket.send(response.encode())
+                print('Proxy has sent the file. File size : {}'.format(file_size))
+                socket.close()
+            else:
+                print('response ', content_or_response)
+                socket.send(content_or_response)
+                print('Proxy has sent the response from the server.')
+                socket.close()
     else:
-        response = content_or_response
-        socket.send(response.encode())
-        print('Proxy has sent the response from the server.')
+        # reply "HTTP Bad Request" (code 400)
+        socket.send(b'400 Bad Request')
+        print(b'400 Bad Request')
         socket.close()
 
 
