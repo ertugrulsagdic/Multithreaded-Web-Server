@@ -67,7 +67,7 @@ def thread_function(socket, address):
                 socket.close()
             else:
                 # reply "HTTP OK" (code 200)
-                response_message = '200 OK\n'
+                response_message = 'HTTP/1.0 200 OK\n'
 
                 response_content_body = ''
                 for _ in range(0, file_size - 78):

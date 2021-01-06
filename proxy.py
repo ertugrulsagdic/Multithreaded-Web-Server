@@ -137,13 +137,8 @@ def thread_function(socket, address):
             socket.close()
         else:
 
-            try:
-                isTrue, content_or_response = get_file(file_size)
-            except:
-                socket.send(b'404 Not Fount')
-                print(b'404 Not Found')
-                socket.close()
-                return
+            isTrue, content_or_response = get_file(file_size)
+
 
             if isTrue:
                 response_headers = {
@@ -151,7 +146,7 @@ def thread_function(socket, address):
                     'Content-Length': len(content_or_response),
                 }
                 response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
-                response = '200 OK\n' + response_headers_raw + '\n' + content_or_response
+                response = 'HTTP/1.0 200 OK\n' + response_headers_raw + '\n' + content_or_response
                 socket.send(response.encode())
                 print('Proxy has sent the file. File size : {}'.format(file_size))
                 socket.close()
