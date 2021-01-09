@@ -5,7 +5,7 @@ import pathlib
 import os
 from urllib.request import Request, urlopen, HTTPError
 
-IP = 'localhost'
+IP = '127.0.0.1'
 # port number
 PORT = 8888
 
@@ -33,8 +33,11 @@ def save_to_cache(file_size, content):
 
 
 def get_file_from_server(file_size):
-    url = 'http://localhost:8080/' + str(file_size)
+    print("DEBUG1")
+    url = 'http://127.0.0.1:8080/' + str(file_size)
+    print("Debug2", url)
     request = Request(url)
+    print("DEBUG3")
 
     try:
         response = urlopen(request)
@@ -78,29 +81,15 @@ def get_file_from_cache(file_size):
 
 def thread_function(socket, address):
     # Get the request
-    request = socket.recv(1024)
+    request = socket.recv(1024).decode()
     print('request ', request)
-
-    if request == b'':
-        return
 
     splitted_request = request.split()
     command = splitted_request[0]
     print("command ", command)
 
-    file_size = 0
-    if len(splitted_request) >= 2:
-        try:
-            file_size = splitted_request[1]
-            print(file_size[1:])
-            file_size = int(file_size[1:])
-            print(b'file size ok')
-        except:
-            socket.send(b'400 Bad Request')
-            socket.send(b'Please enter integer value')
-            print(b'400 Bad Request')
-            socket.close()
-            return
+    if request == b'':
+        return
 
     '''
     proxy server has a restriction. If the requested file size is greater than 9,999 (in
@@ -112,22 +101,37 @@ def thread_function(socket, address):
     #     print(b'414 Request-URI Too Long')
     #     socket.close()
 
-    if command == b'HEAD' \
-            or command == b'POST' \
-            or command == b'PUT' \
-            or command == b'DELETE' \
-            or command == b'CONNECT' \
-            or command == b'OPTIONS' \
-            or command == b'TRACE':
+    if command == 'HEAD' \
+            or command == 'POST' \
+            or command == 'PUT' \
+            or command == 'DELETE' \
+            or command == 'CONNECT' \
+            or command == 'OPTIONS' \
+            or command == 'TRACE':
         # reply "HTTP Not Implemented" (code 501)
         socket.send(b'501 Not implemented')
         print(b'501 Not implemented')
         socket.close()
-    elif command == b'GET':
+    elif command == 'GET':
+
+        file_size = 0
+        if len(splitted_request) >= 2:
+            file_size = splitted_request[1]
+            if(file_size[0] == '/'):
+                print(file_size[1:])
+                file_size = int(file_size[1:])
+            else:
+                print(file_size)
+                urll = file_size.split('/')
+                print(urll)
+                file_size = int(urll[-1])
+                print(file_size)
+            print(b'file size ok')
+
         if file_size < 100:
             # reply "HTTP Bad Request" (code 400)
-            socket.send(b'400 Bad Request')
-            socket.send(b'File size is less than 100\n')
+            socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+            socket.send(b'File size is less than 100\r\n')
             socket.send(b'Please provide file size between 100 and 20000')
             print(b'400 Bad Request')
             print(b'File size is less than 100')
@@ -140,8 +144,13 @@ def thread_function(socket, address):
             socket.close()
         else:
 
-            isTrue, content_or_response = get_file(file_size)
-
+            try:
+                isTrue, content_or_response = get_file(file_size)
+            except:
+                socket.send(b'404 Not Found')
+                print(b'404 Not Found')
+                socket.close()
+                return
 
             if isTrue:
                 response_headers = {

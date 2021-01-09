@@ -52,16 +52,16 @@ def thread_function(socket, address):
         elif command == b'GET':
             if file_size < 100:
                 # reply "HTTP Bad Request" (code 400)
-                socket.send(b'400 Bad Request')
+                socket.send(b'HTTP/1.1 400 Bad Request\r\n')
                 socket.send(b'File size is less than 100\n')
                 socket.send(b'Please provide file size between 100 and 20000')
-                print(b'400 Bad Request')
+                print(b'HTTP/1.1 400 Bad Request')
                 print(b'File size is less than 100')
                 print(b'Please provide file size between 100 and 20000')
                 socket.close()
             elif file_size > 20000:
                 # reply "HTTP Bad Request" (code 400)
-                socket.send(b'400 Bad Request')
+                socket.send(b'HTTP/1.1 400 Bad Request\r\n')
                 socket.send(b'File size is greater than 20000\n')
                 socket.send(b'Please provide file size between 100 and 20000')
                 print(b'400 Bad Request')
@@ -99,19 +99,19 @@ def thread_function(socket, address):
                 socket.close()
         else:
             # reply "HTTP Bad Request" (code 400)
-            socket.send(b'400 Bad Request')
-            print(b'400 Bad Request')
+            socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+            print(b'HTTP/1.1 400 Bad Request')
             socket.close()
     # if any errors caught
     except error:
         # reply "HTTP Bad Request" (code 400)
-        socket.send(b'400 Bad Request')
-        print(b'400 Bad Request')
+        socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+        print(b'HTTP/1.1 400 Bad Request')
         print(error)
         socket.close()
 
 
-IP = 'localhost'
+IP = '127.0.0.1'
 # port number
 PORT = 8080
 # int(sys.argv[1])
@@ -136,13 +136,13 @@ print('Server is ready to receive')
 while True:
     # accepting the incoming request
     connection_socket, address = server_socket.accept()
-    print('Connection\nIP Address and port: {}:{}\n{}\nSocket Protocol: {} Socket Family: {} Socket Type: {}'.format(
-        address[0], address[1], connection_socket, connection_socket.proto, connection_socket.family,
-        connection_socket.type))
+    # print('Connection\nIP Address and port: {}:{}\n{}\nSocket Protocol: {} Socket Family: {} Socket Type: {}'.format(
+    #     address[0], address[1], connection_socket, connection_socket.proto, connection_socket.family,
+    #     connection_socket.type))
     # creates a threads to run incoming requests
     childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
     childThread.start()
-    #childThread.join()
+    childThread.join()
     # connection_socket.close()
 
 # closes socket
