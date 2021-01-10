@@ -130,16 +130,16 @@ def thread_function(socket, address):
 
         if file_size < 100:
             # reply "HTTP Bad Request" (code 400)
-            socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+            socket.send(b'HTTP/1.0 400 Bad Request\r\n')
             socket.send(b'File size is less than 100\r\n')
             socket.send(b'Please provide file size between 100 and 20000')
-            print(b'400 Bad Request')
+            print(b'HTTP/1.0 400 Bad Request')
             print(b'File size is less than 100')
             print(b'Please provide file size between 100 and 20000')
             socket.close()
         elif file_size > 9999:
             # reply "HTTP Bad Request" (code 400)
-            socket.send(b'414 Request-URI Too Long')
+            socket.send(b'HTTP/1.0 414 Request-URI Too Long\r\n')
             print(b'414 Request-URI Too Long')
             socket.close()
         else:
@@ -169,7 +169,7 @@ def thread_function(socket, address):
                 socket.close()
     else:
         # reply "HTTP Bad Request" (code 400)
-        socket.send(b'400 Bad Request')
+        socket.send(b'HTTP/1.0 400 Bad Request\r\n')
         print(b'400 Bad Request')
         socket.close()
 

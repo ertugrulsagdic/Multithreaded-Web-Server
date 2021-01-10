@@ -29,10 +29,10 @@ def thread_function(socket, address):
                 print(b'file size ok')
             except:
                 # reply "HTTP Bad Request" (code 400)
-                socket.send(b'400 Bad Request')
+                socket.send(b'HTTP/1.0 400 Bad Request\r\n')
                 socket.send(b'File size is not integer\n')
                 socket.send(b'Please provide an integer value')
-                print(b'400 Bad Request')
+                print(b'HTTP/1.0 400 Bad Request')
                 print(b'File size is not integer')
                 print(b'Please provide an integer value')
                 socket.close()
@@ -46,13 +46,13 @@ def thread_function(socket, address):
                 or command == b'OPTIONS' \
                 or command == b'TRACE':
             # reply "HTTP Not Implemented" (code 501)
-            socket.send(b'501 Not implemented')
-            print(b'501 Not implemented')
+            socket.send(b'HTTP/1.0 501 Not implemented\r\n')
+            print(b'HTTP/1.0 501 Not implemented')
             socket.close()
         elif command == b'GET':
             if file_size < 100:
                 # reply "HTTP Bad Request" (code 400)
-                socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+                socket.send(b'HTTP/1.0 400 Bad Request\r\n')
                 socket.send(b'File size is less than 100\n')
                 socket.send(b'Please provide file size between 100 and 20000')
                 print(b'HTTP/1.1 400 Bad Request')
@@ -61,7 +61,7 @@ def thread_function(socket, address):
                 socket.close()
             elif file_size > 20000:
                 # reply "HTTP Bad Request" (code 400)
-                socket.send(b'HTTP/1.1 400 Bad Request\r\n')
+                socket.send(b'HTTP/1.0 400 Bad Request\r\n')
                 socket.send(b'File size is greater than 20000\n')
                 socket.send(b'Please provide file size between 100 and 20000')
                 print(b'400 Bad Request')
@@ -99,14 +99,14 @@ def thread_function(socket, address):
                 socket.close()
         else:
             # reply "HTTP Bad Request" (code 400)
-            socket.send(b'HTTP/1.1 400 Bad Request\r\n')
-            print(b'HTTP/1.1 400 Bad Request')
+            socket.send(b'HTTP/1.0 400 Bad Request\r\n')
+            print(b'HTTP/1.0 400 Bad Request')
             socket.close()
     # if any errors caught
     except error:
         # reply "HTTP Bad Request" (code 400)
-        socket.send(b'HTTP/1.1 400 Bad Request\r\n')
-        print(b'HTTP/1.1 400 Bad Request')
+        socket.send(b'HTTP/1.0 400 Bad Request\r\n')
+        print(b'HTTP/1.0 400 Bad Request')
         print(error)
         socket.close()
 
