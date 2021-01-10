@@ -5,7 +5,7 @@ import pathlib
 import os
 from urllib.request import Request, urlopen, HTTPError
 
-IP = '127.0.0.1'
+IP = 'localhost'
 # port number
 PORT = 8888
 
@@ -34,7 +34,7 @@ def save_to_cache(file_size, content):
 
 def get_file_from_server(file_size):
     print("DEBUG1")
-    url = 'http://127.0.0.1:8080/' + str(file_size)
+    url = 'http://localhost:8080/' + str(file_size)
     print("Debug2", url)
     request = Request(url)
     print("DEBUG3")

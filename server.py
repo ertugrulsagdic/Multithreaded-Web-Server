@@ -111,10 +111,9 @@ def thread_function(socket, address):
         socket.close()
 
 
-IP = '127.0.0.1'
+IP = 'localhost'
 # port number
-PORT = 8080
-# int(sys.argv[1])
+PORT = int(sys.argv[1])
 
 # initialize socket
 server_socket = socket(AF_INET, SOCK_STREAM)

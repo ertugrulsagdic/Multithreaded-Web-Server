@@ -3,7 +3,7 @@ import time
 
 # port number
 server_name = 'localhost'
-server_port = 8888
+server_port = 8080
 # connection to server
 client_socket = socket(AF_INET, SOCK_STREAM)
 client_socket.connect((server_name, server_port))
