@@ -1,4 +1,5 @@
 import sys
+import time
 from socket import *
 import threading
 import pathlib
@@ -40,12 +41,22 @@ def get_file_from_server(file_size):
     print("DEBUG3")
 
     try:
-        response = urlopen(request)
-        # print('Response',response)
-        # print("decode",response.read().decode())
-        # print('info',response.info())
+        server_name = 'localhost'
+        server_port = 8080
+        # connection to server
+        client_socket = socket(AF_INET, SOCK_STREAM)
+        client_socket.connect((server_name, server_port))
 
-        return response.read().decode()
+        request = 'GET /' + str(file_size)
+        client_socket.send(request.encode())
+        response = client_socket.recv(1024)
+        print('From server: ', response.decode())
+        splitted_response = response.split('\n')
+        print('response decode: ', splitted_response[3])
+
+        client_socket.close()
+
+        return response.decode()
     except HTTPError:
         print(HTTPError)
         return None
@@ -147,7 +158,7 @@ def thread_function(socket, address):
             try:
                 isTrue, content_or_response = get_file(file_size)
             except:
-                socket.send(b'404 Not Found')
+                socket.send(b'404 Not Found ')
                 print(b'404 Not Found')
                 socket.close()
                 return
