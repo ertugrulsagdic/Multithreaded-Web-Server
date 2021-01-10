@@ -34,11 +34,11 @@ def save_to_cache(file_size, content):
 
 
 def get_file_from_server(file_size):
-    print("DEBUG1")
-    url = 'http://localhost:8080/' + str(file_size)
-    print("Debug2", url)
-    request = Request(url)
-    print("DEBUG3")
+    # print("DEBUG1")
+    # url = 'http://localhost:8080/' + str(file_size)
+    # print("Debug2", url)
+    # request = Request(url)
+    # print("DEBUG3")
 
     try:
         server_name = 'localhost'
@@ -47,16 +47,16 @@ def get_file_from_server(file_size):
         client_socket = socket(AF_INET, SOCK_STREAM)
         client_socket.connect((server_name, server_port))
 
-        request = 'GET /' + str(file_size)
+        request = 'GET /' + str(file_size) + ' HTTP/1.0'
         client_socket.send(request.encode())
-        response = client_socket.recv(1024)
-        print('From server: ', response.decode())
-        splitted_response = response.split('\n')
-        print('response decode: ', splitted_response[3])
+        response = client_socket.recv(1024).decode()
+        print('From server: ', response)
+        splitted_response = response.split('\n\n')
+        print('response decode: ', splitted_response)
 
         client_socket.close()
 
-        return response.decode()
+        return splitted_response[1]
     except HTTPError:
         print(HTTPError)
         return None
@@ -128,9 +128,12 @@ def thread_function(socket, address):
         file_size = 0
         if len(splitted_request) >= 2:
             file_size = splitted_request[1]
+
+            # GET /500
             if(file_size[0] == '/'):
                 print(file_size[1:])
                 file_size = int(file_size[1:])
+            # GET http://localhost:8080/500
             else:
                 print(file_size)
                 urll = file_size.split('/')
