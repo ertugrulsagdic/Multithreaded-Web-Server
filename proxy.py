@@ -200,7 +200,7 @@ def main():
         print(msg)
         sys.exit()
 
-    server_socket.listen(10)
+    server_socket.listen(1000)
 
     print('Proxy Server ready to receive')
     

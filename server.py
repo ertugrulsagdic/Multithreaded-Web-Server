@@ -73,7 +73,7 @@ def thread_function(socket, address):
                 response_message = 'HTTP/1.0 200 OK\n'
 
                 response_content_body = ''
-                for _ in range(0, file_size - 78):
+                for _ in range(0, file_size - len(str(file_size)) - 75):
                     response_content_body = response_content_body + 'a'
 
                 response_content = '<HTML>\n' \
@@ -128,7 +128,7 @@ except socket.error as msg:
     print(msg)
     sys.exit()
 
-server_socket.listen(10)
+server_socket.listen(1000)
 
 print('Server is ready to receive')
 
