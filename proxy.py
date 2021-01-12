@@ -4,7 +4,6 @@ from socket import *
 import threading
 import pathlib
 import os
-from urllib.request import Request, urlopen, HTTPError
 
 IP = 'localhost'
 # port number
