@@ -141,7 +141,7 @@ while True:
     # creates a threads to run incoming requests
     childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
     childThread.start()
-    childThread.join()
+    #childThread.join()
     # connection_socket.close()
 
 # closes socket
