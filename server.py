@@ -1,9 +1,6 @@
 import sys
 from socket import *
 import threading
-import pathlib
-import os
-
 
 # Tread function which executes the request
 def thread_function(socket, address):
@@ -135,14 +132,9 @@ print('Server is ready to receive')
 while True:
     # accepting the incoming request
     connection_socket, address = server_socket.accept()
-    # print('Connection\nIP Address and port: {}:{}\n{}\nSocket Protocol: {} Socket Family: {} Socket Type: {}'.format(
-    #     address[0], address[1], connection_socket, connection_socket.proto, connection_socket.family,
-    #     connection_socket.type))
-    # creates a threads to run incoming requests
     childThread = threading.Thread(target=thread_function, args=(connection_socket, address))
     childThread.start()
     childThread.join()
-    # connection_socket.close()
 
 # closes socket
 server_socket.close()

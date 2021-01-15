@@ -1,10 +1,7 @@
 import sys
-import time
 from socket import *
 import threading
-import pathlib
 import os
-from urllib.request import Request, urlopen, HTTPError
 
 IP = 'localhost'
 # port number
@@ -34,11 +31,6 @@ def save_to_cache(file_size, content):
 
 
 def get_file_from_server(file_size):
-    # print("DEBUG1")
-    # url = 'http://localhost:8080/' + str(file_size)
-    # print("Debug2", url)
-    # request = Request(url)
-    # print("DEBUG3")
 
     try:
         server_name = 'localhost'
@@ -57,8 +49,8 @@ def get_file_from_server(file_size):
         client_socket.close()
 
         return splitted_response[1]
-    except HTTPError:
-        print(HTTPError)
+    except error:
+        print(error)
         return None
 
 
@@ -77,18 +69,6 @@ def get_file_from_cache(file_size):
             return response_content
 
     return None
-    #         response_headers = {
-    #             'Content-Type': 'text/html; encoding=utf8',
-    #             'Content-Length': len(response_content),
-    #         }
-    #         response_headers_raw = ''.join('%s: %s\n' % (k, v) for k, v in response_headers.items())
-    #         # reply as HTTP/1.1 server, saying "HTTP OK" (code 200)
-    #         response = 'HTTP/1.1 200 OK' + response_headers_raw + "\n\n" + response_content
-    #         socket.send(response.encode())
-    #         print('{} sended. File size : {}'.format(file_name, file_size))
-    #         socket.close()
-    #         return True
-    # return False
 
 def thread_function(socket, address):
     # Get the request
